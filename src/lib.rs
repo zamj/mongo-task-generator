@@ -507,6 +507,9 @@ impl GenerateTasksService for GenerateTasksServiceImpl {
                     }
 
                     if task.name == BURN_IN_TAGS {
+                        for key in build_variant_map.keys() {
+                            println!("Key: {}", key)
+                        }
                         for base_bv_name in self
                             .evg_config_utils
                             .lookup_and_split_by_whitespace_build_variant_expansion(
@@ -514,7 +517,9 @@ impl GenerateTasksService for GenerateTasksServiceImpl {
                                 build_variant,
                             )
                         {
-                            let base_build_variant = build_variant_map.get(&base_bv_name).unwrap();
+                            let base_build_variant = build_variant_map.get(&base_bv_name).unwrap_or_else(||panic!(
+                                "Found issue: {}", base_bv_name
+                            ));
                             let run_build_variant_name =
                                 format!("{}-required", base_build_variant.name);
                             thread_handles.push(create_burn_in_worker(
